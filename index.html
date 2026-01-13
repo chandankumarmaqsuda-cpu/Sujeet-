@@ -32,6 +32,7 @@ body{
   position:fixed;
   top:0;
   width:14px;
+
   height:100vh;
   filter:blur(8px);
   opacity:.25;
@@ -67,7 +68,8 @@ button{
 #secretMsg{display:none;color:#ffb74d;margin-top:8px}
 
 /* STICKER */
-#sticker{
+  
+/*#sticker{
   position:fixed;
   top:-60px;                 /* 🔼 upper */
   left:50%;
@@ -75,7 +77,7 @@ button{
   transform:translateX(-50%) rotate(-90deg); /* 🔄 90° left */
   width:360px;
   z-index:4;
-  cursor:grab;
+  cursor:grab;*/
 
   filter:
     drop-shadow(0 0 8px rgba(255,255,255,.6))
@@ -83,7 +85,6 @@ button{
 
   animation: float 3s ease-in-out infinite;
 }
-
 /* FLOAT */
 @keyframes float{
   0%{ transform:translateX(-50%) rotate(-90deg) translateY(0); }
@@ -120,9 +121,6 @@ button{
   <input id="volumeSlider" type="range" min="0" max="100" value="60">
   <div id="secretMsg">💌 Hydrabad sirf shehar nahi… ek jazba tha</div>
 </div>
-
-<!-- STICKER IMAGE -->
-<img id="sticker" src="IMG20250515180353.jpg">
 
 <audio id="music" loop>
   <source src="ghar-more-pardesiya.mp3">
