@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>Good Bye Hydrabad</title>
+
+<style>
+body{
+  margin:0;
+  font-family:'Segoe UI', Arial;
+  background:#000;
+  color:white;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+}
+
+/* BACKGROUND VIDEO */
+.gif-bg{
+  position:fixed;
+  inset:0;
+  opacity:0.55;
+  z-index:-3;
+}
+.gif-bg video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* NEON */
+.neon{
+  position:fixed;
+  top:0;
+  width:14px;
+  height:100vh;
+  filter:blur(8px);
+  opacity:.25;
+  transition:.15s;
+}
+.neon.left{left:0;}
+.neon.right{right:0;}
+
+/* BOX */
+.box{
+  position:fixed;
+  top:8px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,.6);
+  padding:16px 18px;
+  border-radius:18px;
+  width:92%;
+  max-width:720px;
+  text-align:center;
+}
+h1{font-size:28px;}
+#timer{margin:12px 0;font-size:18px;font-weight:bold;}
+button{
+  padding:12px 26px;
+  border:none;
+  border-radius:30px;
+  background:#ff9800;
+  font-weight:bold;
+  font-size:18px;
+  cursor:pointer;
+}
+#volumeSlider{width:100%;margin-top:10px;}
+#secretMsg{
+  display:none;
+  margin-top:10px;
+  color:#ffb74d;
+}
+
+/* ANAR (FOUNTAIN) */
+.particle{
+  position:fixed;
+  bottom:0;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:gold;
+  animation:shoot 2.5s linear forwards;
+}
+@keyframes shoot{
+  to{
+    transform:translate(var(--x),-70vh);
+    opacity:0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="neon left"></div>
+<div class="neon right"></div>
+
+<div class="gif-bg">
+  <video autoplay muted loop playsinline>
+    <source src="ek-mulakat-jaruri-hai-sanam.mp4">
+  </video>
+</div>
+
+<div class="box">
+  <h1 id="typing"></h1>
+  <div id="timer">Loading...</div>
+
+  <button id="playBtn">▶️ Play</button>
+  <input id="volumeSlider" type="range" min="0" max="100" value="60">
+
+  <div id="secretMsg">💌 Hydrabad sirf shehar nahi… ek jazba tha</div>
+</div>
+
+<audio id="music" loop>
+  <source src="ghar-more-pardesiya.mp3">
+</audio>
+
+<script>
+/* MUSIC */
+const music=document.getElementById("music");
+const btn=document.getElementById("playBtn");
+const slider=document.getElementById("volumeSlider");
+music.volume=.6;
+slider.oninput=()=>music.volume=slider.value/100;
+
+/* AUDIO ANALYSER */
+const AudioContext=window.AudioContext||window.webkitAudioContext;
+const audioCtx=new AudioContext();
+const source=audioCtx.createMediaElementSource(music);
+const analyser=audioCtx.createAnalyser();
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
+analyser.fftSize=128;
+const data=new Uint8Array(analyser.frequencyBinCount);
+
+const neonL=document.querySelector(".neon.left");
+const neonR=document.querySelector(".neon.right");
+
+let smoothBass=0;
+let hue=0;
+let beat=0;
+let unlocked=false;
+
+/* ANAR */
+function anar(){
+  for(let i=0;i<6;i++){
+    const p=document.createElement("div");
+    p.className="particle";
+    p.style.left=Math.random()<.5?"6%":"94%";
+    p.style.setProperty("--x",`${(Math.random()*120-60)}px`);
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),2500);
+  }
+}
+let anarInterval=null;
+
+/* SYNC */
+function sync(){
+  analyser.getByteFrequencyData(data);
+
+  const bass=(data[2]+data[3]+data[4])/3;
+  smoothBass+= (bass-smoothBass)*0.15;
+
+  hue=(hue+1)%360;
+  const color=`hsl(${hue},100%,60%)`;
+
+  neonL.style.background=color;
+  neonR.style.background=color;
+
+  const glow=Math.min(1,smoothBass/140);
+  neonL.style.opacity=.2+glow;
+  neonR.style.opacity=.2+glow;
+  neonL.style.boxShadow=`0 0 ${20+smoothBass}px ${color}`;
+  neonR.style.boxShadow=`0 0 ${20+smoothBass}px ${color}`;
+
+  if(smoothBass>120){
+    beat++;
+    if(beat%2===0) anar();
+    if(beat>=6 && !unlocked){
+      secretMsg.style.display="block";
+      unlocked=true;
+    }
+  }
+  requestAnimationFrame(sync);
+}
+
+/* BUTTON (FIXED PAUSE) */
+let playing=false;
+btn.onclick=()=>{
+  if(!playing){
+    audioCtx.resume();
+    music.play();
+    sync();
+    btn.innerHTML="⏸ Pause";
+    playing=true;
+  }else{
+    music.pause();        // ❌ no reset
+    btn.innerHTML="▶️ Play";
+    playing=false;
+  }
+};
+
+/* TYPING */
+const text="💔Good Bye Hydrabad💔";
+let i=0;
+const typingEl=document.getElementById("typing");
+(function type(){
+  if(i<text.length){
+    typingEl.innerHTML+=text[i++];
+    setTimeout(type,120);
+  }
+})();
+
+/* TIMER */
+const target=new Date("January 17, 2026 00:00:00").getTime();
+setInterval(()=>{
+  const diff=target-Date.now();
+  if(diff<=0){
+    timer.innerHTML="🌆Good Bye Hydrabad";
+    return;
+  }
+  const d=Math.floor(diff/864e5);
+  const h=Math.floor(diff/36e5)%24;
+  const m=Math.floor(diff/6e4)%60;
+  const s=Math.floor(diff/1000)%60;
+  timer.innerHTML=`${d} दिन : ${h} घंटे : ${m} मिनट : ${s} सेकंड`;
+},1000);
+</script>
+
+</body>
+</html>
