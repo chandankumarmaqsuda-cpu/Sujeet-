@@ -46,12 +46,13 @@ body{
   left:50%;
   transform:translateX(-50%);
   background:rgba(0,0,0,.6);
-  padding:16px;
+  padding:20px 16px 16px;
   border-radius:18px;
   width:92%;
   max-width:720px;
   text-align:center;
   z-index:5;
+  overflow:hidden;
 }
 h1{font-size:28px;}
 #timer{margin:12px 0;font-size:18px;font-weight:bold;}
@@ -66,22 +67,19 @@ button{
 #volumeSlider{width:100%;margin-top:10px;}
 #secretMsg{display:none;color:#ffb74d;margin-top:8px}
 
-/* STICKER */
+/* STICKER INSIDE BOX */
 #sticker{
-  position:fixed;
-  top:-14%;                 /* 🔼 upper */
+  position:absolute;
+  top:8px;
   left:50%;
-  transform:translateX(-50%) rotate(-90deg); /* 🔄 90° left */
-  padding:16px;
-  border-radius:18px;
-  width:50%;
-  max-width:720px;
-  z-index:4;
+  transform:translateX(-50%) rotate(-90deg);
+  width:140px;
   cursor:grab;
+  z-index:6;
 
   filter:
-    drop-shadow(0 0 8px rgba(255,255,255,.6))
-    drop-shadow(0 0 16px rgba(0,255,255,.6));
+    drop-shadow(0 0 6px rgba(255,255,255,.6))
+    drop-shadow(0 0 14px rgba(0,255,255,.6));
 
   animation: float 3s ease-in-out infinite;
 }
@@ -89,11 +87,11 @@ button{
 /* FLOAT */
 @keyframes float{
   0%{ transform:translateX(-50%) rotate(-90deg) translateY(0); }
-  50%{ transform:translateX(-50%) rotate(-90deg) translateY(-18px); }
+  50%{ transform:translateX(-50%) rotate(-90deg) translateY(-10px); }
   100%{ transform:translateX(-50%) rotate(-90deg) translateY(0); }
 }
 
-/* DESKTOP SHAKE */
+/* SHAKE (desktop vibration) */
 @keyframes shake{
   0%{transform:translate(0,0)}
   25%{transform:translate(2px,-2px)}
@@ -115,16 +113,19 @@ button{
   </video>
 </div>
 
-<div class="box">
+<div class="box" id="box">
+
+  <!-- PHOTO INSIDE BOX -->
+  <img id="sticker" src="IMG20250515180353.jpg">
+
   <h1 id="typing"></h1>
   <div id="timer">Loading...</div>
+
   <button id="playBtn">▶️ Play</button>
   <input id="volumeSlider" type="range" min="0" max="100" value="60">
+
   <div id="secretMsg">💌 Hydrabad sirf shehar nahi… ek jazba tha</div>
 </div>
-
-<!-- STICKER IMAGE -->
-<img id="sticker" src="IMG20250515180353.jpg">
 
 <audio id="music" loop>
   <source src="ghar-more-pardesiya.mp3">
@@ -155,12 +156,15 @@ const secretMsg=document.getElementById("secretMsg");
 
 let smoothBass=0,beat=0,unlocked=false,hue=0;
 
-/* VIBRATION FUNCTION (5 LEVEL) */
+/* VIBRATION (5 LEVEL) */
 function vibrate(level){
   if(navigator.vibrate){
     const patterns=[
-      [00],
-      [20,80,30]
+      [40],
+      [60,30,60],
+      [80,40,80],
+      [100,50,100],
+      [120,60,120]
     ];
     navigator.vibrate(patterns[level-1]);
   }else{
@@ -177,18 +181,18 @@ function sync(){
 
   hue=(hue+1)%360;
   const color=`hsl(${hue},100%,60%)`;
-
   neonL.style.background=color;
   neonR.style.background=color;
 
-  if(smoothBass>80){
+  if(smoothBass>90){
     beat++;
     let level=1;
-    if(smoothBass>100) level=2;
-    if(smoothBass>120) level=3;
-    if(smoothBass>140) level=4;
-    if(smoothBass>160) level=5;
+    if(smoothBass>110) level=2;
+    if(smoothBass>130) level=3;
+    if(smoothBass>150) level=4;
+    if(smoothBass>170) level=5;
     vibrate(level);
+
     if(beat>6 && !unlocked){
       secretMsg.style.display="block";
       unlocked=true;
@@ -197,7 +201,7 @@ function sync(){
   requestAnimationFrame(sync);
 }
 
-/* BUTTON */
+/* PLAY BUTTON */
 let playing=false;
 btn.onclick=()=>{
   if(!playing){
@@ -213,17 +217,18 @@ btn.onclick=()=>{
   }
 };
 
-/* DRAG STICKER */
+/* DRAG STICKER (INSIDE BOX) */
 let drag=false,ox,oy;
 sticker.onmousedown=e=>{
   drag=true;
-  ox=e.clientX-sticker.offsetLeft;
-  oy=e.clientY-sticker.offsetTop;
+  ox=e.offsetX;
+  oy=e.offsetY;
 };
 document.onmousemove=e=>{
   if(drag){
-    sticker.style.left=(e.clientX-ox)+"px";
-    sticker.style.top=(e.clientY-oy)+"px";
+    const box=document.getElementById("box").getBoundingClientRect();
+    sticker.style.left=(e.clientX-box.left-ox)+"px";
+    sticker.style.top=(e.clientY-box.top-oy)+"px";
   }
 };
 document.onmouseup=()=>drag=false;
