@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>Good Bye Hydrabad</title>
+
+<style>
+body{
+  margin:0;
+  font-family:'Segoe UI', Arial;
+  background:#000;
+  color:white;
+  height:100vh;
+  overflow:hidden;
+}
+
+/* BACKGROUND VIDEO */
+.gif-bg{
+  position:fixed;
+  inset:0;
+  opacity:0.55;
+  z-index:-3;
+}
+.gif-bg video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* NEON */
+.neon{
+  position:fixed;
+  top:0;
+  width:14px;
+  height:100vh;
+  filter:blur(8px);
+  opacity:.25;
+}
+.neon.left{left:0;}
+.neon.right{right:0;}
+
+/* BOX */
+.box{
+  position:fixed;
+  top:8px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,.6);
+  padding:16px;
+  border-radius:18px;
+  width:92%;
+  max-width:720px;
+  text-align:center;
+  z-index:5;
+}
+h1{font-size:28px;}
+#timer{margin:12px 0;font-size:18px;font-weight:bold;}
+button{
+  padding:12px 26px;
+  border:none;
+  border-radius:30px;
+  background:#ff9800;
+  font-weight:bold;
+  font-size:18px;
+}
+#volumeSlider{width:100%;margin-top:10px;}
+#secretMsg{display:none;color:#ffb74d;margin-top:8px}
+
+/* STICKER */
+#sticker{
+  position:fixed;
+  top:-10%;                 /* 🔼 upper */
+  left:50%;
+  transform:translateX(-50%) rotate(-90deg); /* 🔄 90° left */
+  width:180px;
+  z-index:4;
+  cursor:grab;
+
+  filter:
+    drop-shadow(0 0 8px rgba(255,255,255,.6))
+    drop-shadow(0 0 16px rgba(0,255,255,.6));
+
+  animation: float 3s ease-in-out infinite;
+}
+
+/* FLOAT */
+@keyframes float{
+  0%{ transform:translateX(-50%) rotate(-90deg) translateY(0); }
+  50%{ transform:translateX(-50%) rotate(-90deg) translateY(-18px); }
+  100%{ transform:translateX(-50%) rotate(-90deg) translateY(0); }
+}
+
+/* DESKTOP SHAKE */
+@keyframes shake{
+  0%{transform:translate(0,0)}
+  25%{transform:translate(2px,-2px)}
+  50%{transform:translate(-2px,2px)}
+  75%{transform:translate(2px,2px)}
+  100%{transform:translate(0,0)}
+}
+</style>
+</head>
+
+<body>
+
+<div class="neon left"></div>
+<div class="neon right"></div>
+
+<div class="gif-bg">
+  <video autoplay muted loop playsinline>
+    <source src="ek-mulakat-jaruri-hai-sanam.mp4">
+  </video>
+</div>
+
+<div class="box">
+  <h1 id="typing"></h1>
+  <div id="timer">Loading...</div>
+  <button id="playBtn">▶️ Play</button>
+  <input id="volumeSlider" type="range" min="0" max="100" value="60">
+  <div id="secretMsg">💌 Hydrabad sirf shehar nahi… ek jazba tha</div>
+</div>
+
+<!-- STICKER IMAGE -->
+<img id="sticker" src="IMG20250515180353.jpg">
+
+<audio id="music" loop>
+  <source src="ghar-more-pardesiya.mp3">
+</audio>
+
+<script>
+/* MUSIC */
+const music=document.getElementById("music");
+const btn=document.getElementById("playBtn");
+const slider=document.getElementById("volumeSlider");
+music.volume=.6;
+slider.oninput=()=>music.volume=slider.value/100;
+
+/* AUDIO ANALYSER */
+const AudioContext=window.AudioContext||window.webkitAudioContext;
+const audioCtx=new AudioContext();
+const src=audioCtx.createMediaElementSource(music);
+const analyser=audioCtx.createAnalyser();
+src.connect(analyser);
+analyser.connect(audioCtx.destination);
+analyser.fftSize=128;
+const data=new Uint8Array(analyser.frequencyBinCount);
+
+const neonL=document.querySelector(".neon.left");
+const neonR=document.querySelector(".neon.right");
+const sticker=document.getElementById("sticker");
+const secretMsg=document.getElementById("secretMsg");
+
+let smoothBass=0,beat=0,unlocked=false,hue=0;
+
+/* VIBRATION FUNCTION (5 LEVEL) */
+function vibrate(level){
+  if(navigator.vibrate){
+    const patterns=[
+      [40],
+      [60,30,60],
+      [120,60,120],
+    ];
+    navigator.vibrate(patterns[level-1]);
+  }else{
+    sticker.style.animation="shake .15s";
+    setTimeout(()=>sticker.style.animation="float 3s ease-in-out infinite",150);
+  }
+}
+
+/* SYNC */
+function sync(){
+  analyser.getByteFrequencyData(data);
+  const bass=(data[2]+data[3]+data[4])/3;
+  smoothBass+=(bass-smoothBass)*.15;
+
+  hue=(hue+1)%360;
+  const color=`hsl(${hue},100%,60%)`;
+
+  neonL.style.background=color;
+  neonR.style.background=color;
+
+  if(smoothBass>80){
+    beat++;
+    let level=1;
+    if(smoothBass>100) level=2;
+    if(smoothBass>120) level=3;
+    if(smoothBass>140) level=4;
+    if(smoothBass>160) level=5;
+    vibrate(level);
+    if(beat>6 && !unlocked){
+      secretMsg.style.display="block";
+      unlocked=true;
+    }
+  }
+  requestAnimationFrame(sync);
+}
+
+/* BUTTON */
+let playing=false;
+btn.onclick=()=>{
+  if(!playing){
+    audioCtx.resume();
+    music.play();
+    sync();
+    btn.innerHTML="⏸ Pause";
+    playing=true;
+  }else{
+    music.pause();
+    btn.innerHTML="▶️ Play";
+    playing=false;
+  }
+};
+
+/* DRAG STICKER */
+let drag=false,ox,oy;
+sticker.onmousedown=e=>{
+  drag=true;
+  ox=e.clientX-sticker.offsetLeft;
+  oy=e.clientY-sticker.offsetTop;
+};
+document.onmousemove=e=>{
+  if(drag){
+    sticker.style.left=(e.clientX-ox)+"px";
+    sticker.style.top=(e.clientY-oy)+"px";
+  }
+};
+document.onmouseup=()=>drag=false;
+
+/* TYPING */
+const text="💔Good Bye Hydrabad💔";
+let i=0;
+const typing=document.getElementById("typing");
+(function type(){
+  if(i<text.length){
+    typing.innerHTML+=text[i++];
+    setTimeout(type,120);
+  }
+})();
+
+/* TIMER */
+const target=new Date("January 17, 2026 00:00:00").getTime();
+setInterval(()=>{
+  const diff=target-Date.now();
+  if(diff<=0){timer.innerHTML="🌆Good Bye Hydrabad";return;}
+  const d=Math.floor(diff/864e5);
+  const h=Math.floor(diff/36e5)%24;
+  const m=Math.floor(diff/6e4)%60;
+  const s=Math.floor(diff/1000)%60;
+  timer.innerHTML=`${d} दिन : ${h} घंटे : ${m} मिनट : ${s} सेकंड`;
+},1000);
+</script>
+
+</body>
+</html>
