@@ -3,77 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <title>Good Bye Hyderabad 💔</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <style>
-/* FLOATING SOCIAL BAR */
-.social{
-  position:fixed;
-  bottom:18px;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:20px;
-  z-index:30;
-}
-
-.social a{
-  width:52px;height:52px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  font-size:24px;
-  position:relative;
-  text-decoration:none;
-  background:rgba(255,255,255,.08);
-}
-
-/* ROTATING NEON (CONSTANT SPEED) */
-.social a::before{
-  content:"";
-  position:absolute;
-  inset:-6px;
-  border-radius:50%;
-  filter:blur(7px);
-  animation:spin 3.5s linear infinite;
-  z-index:-1;
-}
-
-/* COLORS */
-.fb::before{
-  background:conic-gradient(transparent,#2196f3,#00e5ff,transparent);
-}
-.insta::before{
-  background:conic-gradient(transparent,#ff00ff,#ff9800,transparent);
-}
-.wa::before{
-  background:conic-gradient(transparent,#00ff6a,#00c853,transparent);
-}
-
-/* TAP BLAST */
-.social a:active{
-  transform:scale(1.25);
-  box-shadow:0 0 40px currentColor,0 0 80px currentColor;
-}
-
-@keyframes spin{
-  from{transform:rotate(0deg)}
-  to{transform:rotate(360deg)}
-}
-
-#secret{
-  display:none;
-  margin-top:10px;
-  color:#ffb74d;
-}
 body{
   margin:0;
   font-family:'Segoe UI', Arial;
   background:#000;
-  color:white;
+  color:#fff;
   height:100vh;
   overflow:hidden;
 }
@@ -89,6 +29,8 @@ body{
   height:100%;
   object-fit:cover;
   opacity:.6;
+  transform:translateZ(0);
+  will-change:transform;
 }
 
 /* BOX */
@@ -103,82 +45,101 @@ body{
   width:94%;
   max-width:720px;
   text-align:center;
-  backdrop-filter:blur(6px);
 }
 
-h1{font-size:26px;margin:6px 0}
-#timer{margin:10px 0;font-size:18px;font-weight:600}
+h2{margin:6px 0}
+#timer{
+  margin:10px 0;
+  font-size:18px;
+  font-weight:600;
+}
 
 button{
   padding:12px 28px;
   border:none;
   border-radius:30px;
   background:linear-gradient(45deg,#ff8a65,#ff5252);
-  color:#000;
   font-weight:bold;
   font-size:17px;
 }
 
-#final{
-  display:none;
-  margin-top:12px;
-  color:#ffb6c1;
-  font-size:15px;
-  animation:fade 3s infinite alternate;
-}
-
-@keyframes fade{
-  from{opacity:.4}
-  to{opacity:1}
-}
-
-/* ROSE PETALS */
-.petals{
-  pointer-events:none;
+/* 🌐 SOCIAL BAR */
+.social{
   position:fixed;
-  inset:0;
-  overflow:hidden;
-  z-index:5;
-}
-.petal{
-  position:absolute;
-  top:-50px;
-  animation:fall linear infinite;
+  bottom:18px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:20px;
+  z-index:30;
 }
 
-@keyframes fall{
-  to{
-    transform:translateY(110vh) rotate(360deg);
-    opacity:0;
-  }
+.social a{
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:24px;
+  text-decoration:none;
+  position:relative;
+}
+
+.social a::before{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border-radius:50%;
+  filter:blur(7px);
+  animation:spin 3.5s linear infinite;
+  z-index:-1;
+}
+
+.fb::before{
+  background:conic-gradient(transparent,#2196f3,#00e5ff,transparent);
+}
+.insta::before{
+  background:conic-gradient(transparent,#ff00ff,#ff9800,transparent);
+}
+.wa::before{
+  background:conic-gradient(transparent,#00ff6a,#00c853,transparent);
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
 }
 </style>
 </head>
 
 <body>
 
+<!-- 🎥 VIDEO -->
 <div class="bg">
-  <video id="bgVideo" muted loop playsinline preload="auto">
-    <source src="night.mp4">
+  <video id="bgVideo" loop playsinline preload="auto">
+    <source src="night.mp4" type="video/mp4">
   </video>
 </div>
 
+<!-- 🔊 AUDIO -->
+<audio id="music" preload="auto">
+  <source src="song.mp3" type="audio/mpeg">
+</audio>
+
+<!-- CONTENT -->
 <div class="box">
-  <h1 id="type"></h1>
+  <h2 id="type"></h2>
   <div id="timer">Loading...</div>
-
   <button id="btn">▶ Play</button>
-
-  <div id="final">🌹 Hyderabad… yaadein gir rahi hain… 💔</div>
 </div>
 
-<div class="petals" id="petals"></div>
-<!-- SOCIAL ICONS -->
+<!-- 🌐 SOCIAL ICONS -->
 <div class="social">
   <a class="fb" href="https://www.facebook.com/share/1BvfUcCArK/" target="_blank">
     <i class="fab fa-facebook-f"></i>
   </a>
-  <a class="insta" href="https://www.instagram.com/mr.sujeet__paswan__ji?igsh=dXk1OGFkZ2lvYTBv" target="_blank">
+  <a class="insta" href="https://www.instagram.com/mr.sujeet__paswan__ji" target="_blank">
     <i class="fab fa-instagram"></i>
   </a>
   <a class="wa" href="https://wa.me/917808850892" target="_blank">
@@ -186,44 +147,57 @@ button{
   </a>
 </div>
 
-<audio id="music" loop preload="auto">
-  <source src="night.mp3">
-</audio>
-
 <script>
-/* VIDEO SETUP */
+/* ELEMENTS */
 const bgVideo = document.getElementById("bgVideo");
-bgVideo.playbackRate = 0.75;
+const music   = document.getElementById("music");
+const btn     = document.getElementById("btn");
+const timerEl = document.getElementById("timer");
 
-/* Hold video at 2 seconds */
-bgVideo.addEventListener("loadedmetadata", ()=>{
-  bgVideo.currentTime = 2;
-  bgVideo.pause();
-});
+/* SPEED */
+bgVideo.playbackRate = 1.0;
+music.playbackRate  = 1.0;
+music.volume = 0.6;
 
-/* MUSIC */
-const music = document.getElementById("music");
-music.volume = 0.55;
-
-const btn = document.getElementById("btn");
 let playing = false;
 
-/* PLAY / PAUSE – AUDIO + VIDEO SYNC */
-btn.onclick = async ()=>{
-  if(!playing){
-    await bgVideo.play();
-    await music.play();
-    btn.innerHTML = "⏸ Pause";
-    playing = true;
-  }else{
+/* PRELOAD VIDEO AT 5s */
+bgVideo.addEventListener("loadedmetadata", ()=>{
+  if(bgVideo.duration > 5){
+    bgVideo.currentTime = 5;
     bgVideo.pause();
-    music.pause();
-    btn.innerHTML = "▶ Play";
-    playing = false;
   }
-};
+});
 
-/* TYPING EFFECT */
+/* PLAY */
+function playAll(){
+  if(bgVideo.currentTime < 5){
+    bgVideo.currentTime = 5;
+  }
+  bgVideo.muted = false;
+  bgVideo.volume = 1;
+
+  bgVideo.play();
+  music.play();
+
+  btn.innerHTML = "⏸ Pause";
+  playing = true;
+}
+
+/* PAUSE */
+function pauseAll(){
+  bgVideo.pause();
+  music.pause();
+  btn.innerHTML = "▶ Play";
+  playing = false;
+}
+
+/* BUTTON */
+btn.addEventListener("click", ()=>{
+  playing ? pauseAll() : playAll();
+});
+
+/* TYPE EFFECT */
 const msg="💔 Good Bye Hyderabad 💔";
 const typeEl=document.getElementById("type");
 let i=0;
@@ -234,44 +208,23 @@ let i=0;
   }
 })();
 
-/* TIMER – 17 JAN 2026 22:50 */
-const timer=document.getElementById("timer");
-const final=document.getElementById("final");
-const petalsBox=document.getElementById("petals");
-
-const target=new Date("January 17, 2026 22:50:00").getTime();
-let petalsStarted=false;
+/* ⏰ TIMER — 17 JAN 2026, 22:50 */
+const target = new Date("January 17, 2026 22:50:00").getTime();
 
 setInterval(()=>{
-  const d=target-Date.now();
-  if(d<=0){
-    timer.innerHTML="🌌 The last moment…";
-    final.style.display="block";
-    if(!petalsStarted){
-      startPetals();
-      petalsStarted=true;
-    }
+  const diff = target - Date.now();
+
+  if(diff <= 0){
+    timerEl.innerHTML = "🌌 The last moment…";
     return;
   }
-  const h=Math.floor(d/36e5);
-  const m=Math.floor(d/6e4)%60;
-  const s=Math.floor(d/1000)%60;
-  timer.innerHTML=`${h}h ${m}m ${s}s remaining`;
-},1000);
 
-/* ROSE FALL */
-function startPetals(){
-  setInterval(()=>{
-    const p=document.createElement("div");
-    p.className="petal";
-    p.innerHTML="🌹";
-    p.style.left=Math.random()*100+"vw";
-    p.style.fontSize=18+Math.random()*16+"px";
-    p.style.animationDuration=5+Math.random()*5+"s";
-    petalsBox.appendChild(p);
-    setTimeout(()=>p.remove(),10000);
-  },300);
-}
+  const h = Math.floor(diff / 36e5);
+  const m = Math.floor(diff / 6e4) % 60;
+  const s = Math.floor(diff / 1000) % 60;
+
+  timerEl.innerHTML = `${h}h ${m}m ${s}s remaining`;
+},1000);
 </script>
 
 </body>
