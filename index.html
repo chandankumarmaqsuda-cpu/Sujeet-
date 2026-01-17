@@ -2,23 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Good Bye Hyderabad 💔</title>
+<title>Good Bye Hydrabad 💔</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="stylesheet"
- href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
 body{
   margin:0;
-  font-family:'Segoe UI', Arial;
   background:#000;
   color:#fff;
-  height:100vh;
   overflow:hidden;
+  font-family:'Segoe UI', Arial;
 }
 
-/* BACKGROUND VIDEO */
+/* 🎥 BACKGROUND VIDEO */
 .bg{
   position:fixed;
   inset:0;
@@ -29,11 +25,9 @@ body{
   height:100%;
   object-fit:cover;
   opacity:.6;
-  transform:translateZ(0);
-  will-change:transform;
 }
 
-/* BOX */
+/* CONTROL BOX */
 .box{
   position:fixed;
   top:14px;
@@ -45,186 +39,234 @@ body{
   width:94%;
   max-width:720px;
   text-align:center;
+  z-index:10;
 }
 
-h2{margin:6px 0}
 #timer{
-  margin:10px 0;
   font-size:18px;
-  font-weight:600;
+  margin:10px 0;
 }
 
 button{
-  padding:12px 28px;
+  padding:12px 30px;
   border:none;
   border-radius:30px;
-  background:linear-gradient(45deg,#ff8a65,#ff5252);
-  font-weight:bold;
   font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
 }
 
-/* 🌐 SOCIAL BAR */
-.social{
+/* 🔥 TIME UP SCREEN */
+#timeUpScreen{
   position:fixed;
-  bottom:18px;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:20px;
-  z-index:30;
+  inset:0;
+  display:none;
+  background:#000;
+  z-index:999;
+  overflow:hidden;
 }
 
-.social a{
-  width:52px;
-  height:52px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  font-size:24px;
-  text-decoration:none;
-  position:relative;
-}
-
-.social a::before{
+/* 🌈 RGB NEON BORDER */
+#timeUpScreen::before{
   content:"";
   position:absolute;
-  inset:-6px;
+  inset:0;
+  border:6px solid transparent;
+  border-image:linear-gradient(
+    45deg,
+    red,orange,yellow,lime,cyan,blue,violet,red
+  ) 1;
+  animation:rgb 3s linear infinite;
+  z-index:1;
+}
+
+@keyframes rgb{
+  100%{filter:hue-rotate(360deg);}
+}
+
+/* ☁️ CLOUD LAYER */
+#clouds{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:150px;
+  z-index:2;
+  pointer-events:none;
+}
+
+.cloud{
+  position:absolute;
+  top:20px;
+  width:200px;
+  height:60px;
+  background:rgba(255,255,255,0.15);
+  border-radius:50px;
+  filter:blur(2px);
+  animation:moveCloud linear infinite;
+}
+
+.cloud::before,
+.cloud::after{
+  content:"";
+  position:absolute;
+  background:inherit;
+  width:100px;
+  height:100px;
   border-radius:50%;
-  filter:blur(7px);
-  animation:spin 3.5s linear infinite;
-  z-index:-1;
+  top:-45px;
 }
 
-.fb::before{
-  background:conic-gradient(transparent,#2196f3,#00e5ff,transparent);
-}
-.insta::before{
-  background:conic-gradient(transparent,#ff00ff,#ff9800,transparent);
-}
-.wa::before{
-  background:conic-gradient(transparent,#00ff6a,#00c853,transparent);
+.cloud::before{ left:20px; }
+.cloud::after{ right:20px; }
+
+@keyframes moveCloud{
+  from{ transform:translateX(-250px); }
+  to{ transform:translateX(120vw); }
 }
 
-@keyframes spin{
-  to{transform:rotate(360deg)}
+/* 💔 ROTATED GOODBYE TEXT */
+#byeText{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%) rotate(-90deg);
+  font-size:42px;
+  font-weight:900;
+  white-space:nowrap;
+  animation:pulse 2s infinite;
+  z-index:5;
+}
+
+@keyframes pulse{
+  50%{
+    transform:translate(-50%,-50%) rotate(-90deg) scale(1.08);
+  }
+}
+
+/* 🌹 ROSE RAIN */
+.rose{
+  position:absolute;
+  top:-60px;
+  animation:fall linear infinite;
+  pointer-events:none;
+  z-index:4;
+}
+
+@keyframes fall{
+  to{
+    transform:translateY(120vh) rotate(360deg);
+    opacity:0;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🎥 VIDEO -->
+<!-- VIDEO -->
 <div class="bg">
   <video id="bgVideo" loop playsinline preload="auto">
     <source src="night.mp4" type="video/mp4">
   </video>
 </div>
 
-<!-- 🔊 AUDIO -->
-<audio id="music" preload="auto">
+<!-- AUDIO -->
+<audio id="music">
   <source src="song.mp3" type="audio/mpeg">
 </audio>
 
-<!-- CONTENT -->
-<div class="box">
-  <h2 id="type"></h2>
+<!-- MAIN CONTENT -->
+<div class="box" id="mainBox">
+  <h2>💔 Good Bye Hyderabad 💔</h2>
   <div id="timer">Loading...</div>
   <button id="btn">▶ Play</button>
 </div>
 
-<!-- 🌐 SOCIAL ICONS -->
-<div class="social">
-  <a class="fb" href="https://www.facebook.com/share/1BvfUcCArK/" target="_blank">
-    <i class="fab fa-facebook-f"></i>
-  </a>
-  <a class="insta" href="https://www.instagram.com/mr.sujeet__paswan__ji" target="_blank">
-    <i class="fab fa-instagram"></i>
-  </a>
-  <a class="wa" href="https://wa.me/917808850892" target="_blank">
-    <i class="fab fa-whatsapp"></i>
-  </a>
+<!-- TIME UP MODE -->
+<div id="timeUpScreen">
+  <div id="clouds"></div>
+  <div id="byeText">💔 Good Bye Hydrabad 💔</div>
 </div>
 
 <script>
-/* ELEMENTS */
 const bgVideo = document.getElementById("bgVideo");
 const music   = document.getElementById("music");
 const btn     = document.getElementById("btn");
 const timerEl = document.getElementById("timer");
+const timeUp  = document.getElementById("timeUpScreen");
+const mainBox = document.getElementById("mainBox");
+const clouds  = document.getElementById("clouds");
 
-/* SPEED */
-bgVideo.playbackRate = 1.0;
-music.playbackRate  = 1.0;
-music.volume = 0.6;
+let playing=false;
 
-let playing = false;
-
-/* PRELOAD VIDEO AT 5s */
-bgVideo.addEventListener("loadedmetadata", ()=>{
-  if(bgVideo.duration > 5){
-    bgVideo.currentTime = 5;
+/* PLAY / PAUSE */
+btn.onclick=()=>{
+  if(!playing){
+    bgVideo.currentTime=5;
+    bgVideo.play();
+    music.play();
+    btn.innerText="⏸ Pause";
+    playing=true;
+  }else{
     bgVideo.pause();
+    music.pause();
+    btn.innerText="▶ Play";
+    playing=false;
   }
-});
+};
 
-/* PLAY */
-function playAll(){
-  if(bgVideo.currentTime < 5){
-    bgVideo.currentTime = 5;
-  }
-  bgVideo.muted = false;
-  bgVideo.volume = 1;
-
-  bgVideo.play();
-  music.play();
-
-  btn.innerHTML = "⏸ Pause";
-  playing = true;
-}
-
-/* PAUSE */
-function pauseAll(){
-  bgVideo.pause();
-  music.pause();
-  btn.innerHTML = "▶ Play";
-  playing = false;
-}
-
-/* BUTTON */
-btn.addEventListener("click", ()=>{
-  playing ? pauseAll() : playAll();
-});
-
-/* TYPE EFFECT */
-const msg="💔 Good Bye Hyderabad 💔";
-const typeEl=document.getElementById("type");
-let i=0;
-(function type(){
-  if(i<msg.length){
-    typeEl.innerHTML+=msg[i++];
-    setTimeout(type,120);
-  }
-})();
-
-/* ⏰ TIMER — 17 JAN 2026, 22:50 */
+/* ⏰ TIMER */
 const target = new Date("January 17, 2026 22:50:00").getTime();
 
-setInterval(()=>{
+const timer = setInterval(()=>{
   const diff = target - Date.now();
 
-  if(diff <= 0){
-    timerEl.innerHTML = "🌌 The last moment…";
+  if(diff<=0){
+    clearInterval(timer);
+    timeUpMode();
     return;
   }
 
-  const h = Math.floor(diff / 36e5);
-  const m = Math.floor(diff / 6e4) % 60;
-  const s = Math.floor(diff / 1000) % 60;
-
-  timerEl.innerHTML = `${h}h ${m}m ${s}s remaining`;
+  const h=Math.floor(diff/36e5);
+  const m=Math.floor(diff/6e4)%60;
+  const s=Math.floor(diff/1000)%60;
+  timerEl.innerHTML=`${h}h ${m}m ${s}s remaining`;
 },1000);
+
+/* 🔥 TIME UP MODE */
+function timeUpMode(){
+  bgVideo.pause();
+  music.pause();
+  bgVideo.remove();
+  music.remove();
+  mainBox.style.display="none";
+  timeUp.style.display="block";
+
+  /* ☁️ CREATE CLOUDS */
+  for(let i=0;i<7;i++){
+    const c=document.createElement("div");
+    c.className="cloud";
+    c.style.top=(10+Math.random()*60)+"px";
+    c.style.animationDuration=(25+Math.random()*20)+"s";
+    c.style.opacity=0.15+Math.random()*0.2;
+    clouds.appendChild(c);
+  }
+
+  /* 🌹 ROSE RAIN FROM CLOUDS */
+  setInterval(()=>{
+    for(let i=0;i<8;i++){
+      const r=document.createElement("div");
+      r.className="rose";
+      r.innerHTML="🌹";
+      r.style.left=Math.random()*100+"vw";
+      r.style.fontSize=(24+Math.random()*20)+"px";
+      r.style.animationDuration=(4+Math.random()*4)+"s";
+      timeUp.appendChild(r);
+      setTimeout(()=>r.remove(),9000);
+    }
+  },180);
+}
 </script>
 
 </body>
